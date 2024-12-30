@@ -7,6 +7,7 @@ from pystray import Icon, MenuItem, Menu  # Импортируем модули 
 from PIL import Image, ImageDraw  # Импортируем библиотеки PIL для работы с изображениями и рисования
 import threading  # Импортируем библиотеку для многозадачности
 from tkinter import filedialog  # Импортируем диалог выбора файлов и папок
+from tkinter import ttk
 
 import sqlite3
 
@@ -158,7 +159,7 @@ def center_window(window, width, height):
     window.geometry(f"{width}x{height}+{x}+{y}")  # Устанавливаем геометрию окна с центровкой
 def show_settings():
     """Окно для настройки пути и формата сохранения."""
-    settings_window = tk.Toplevel()  # Создаем новое окно для настроек
+    settings_window = ttk.Notebook() # Создаем новое окно для настроек
     settings_window.title("Настройки")
 
     # Получаем текущие настройки из базы данных
@@ -244,6 +245,7 @@ exit_flag = threading.Event()
 tray_thread = threading.Thread(target=create_tray_icon, args=(exit_flag,), daemon=True)
 tray_thread.start()  # Запускаем иконку в системном трее
 
+root.iconbitmap("ico/favicon_.ico")
 # Основной цикл Tkinter
 root.mainloop()
 
