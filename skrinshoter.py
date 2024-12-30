@@ -84,7 +84,7 @@ def start_selection(event):
     start_x, start_y = event.x, event.y  # Сохраняем начальные координаты, где пользователь нажал мышью
     canvas.delete("all")  # Удаляем все старые выделения с экрана
     # Создаём новый прямоугольник, который будет отображать выделенную область
-    rect_id = canvas.create_rectangle(start_x, start_y, start_x, start_y, outline="white", fill="white", width=2, dash=(4, 4))
+    rect_id = canvas.create_rectangle(start_x, start_y, start_x, start_y, outline="white", fill="", width=2, dash=(4, 4))
 
 def update_selection(event):
     """Обновление рамки области."""
@@ -117,7 +117,7 @@ def select_area():
     # Создаем прозрачное окно для выделения области
     selection_window = tk.Toplevel()  # Создаем новое окно
     selection_window.attributes("-fullscreen", True)  # Делаем окно полноэкранным
-    selection_window.attributes("-alpha", 0.8)  # Устанавливаем прозрачность окна
+    selection_window.attributes("-alpha", 0.4)  # Устанавливаем прозрачность окна
     selection_window.config(bg="gray")  # Устанавливаем серый фон
 
     # Создаем Canvas для отображения рамки выделения
