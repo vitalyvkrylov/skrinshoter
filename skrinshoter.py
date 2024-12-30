@@ -85,7 +85,7 @@ def start_selection(event):
     start_x, start_y = event.x, event.y  # Сохраняем начальные координаты, где пользователь нажал мышью
     canvas.delete("all")  # Удаляем все старые выделения с экрана
     # Создаём новый прямоугольник, который будет отображать выделенную область
-    rect_id = canvas.create_rectangle(start_x, start_y, start_x, start_y, outline="white", fill="", width=2, dash=(4, 4))
+    rect_id = canvas.create_rectangle(start_x, start_y, start_x, start_y, outline="white", fill="white", width=2, dash=(4, 4))
 
 def update_selection(event):
     """Обновление рамки области."""
@@ -112,25 +112,40 @@ def stop_selection(event):
     selection_window.destroy()  # Закрываем окно выделения
 
 def select_area():
-    """Создает окно для выбора области экрана."""
+    """Создает окно для выбора области экрана с динамической прозрачностью."""
     global canvas, rect_id, selection_window  # Делаем переменные глобальными
 
-    # Создаем прозрачное окно для выделения области
-    selection_window = tk.Toplevel()  # Создаем новое окно
-    selection_window.attributes("-fullscreen", True)  # Делаем окно полноэкранным
-    selection_window.attributes("-alpha", 0.4)  # Устанавливаем прозрачность окна
-    selection_window.config(bg="gray")  # Устанавливаем серый фон
+    # Создаем окно для выделения области
+    selection_window = tk.Toplevel()  # Создаём новое окно
+    selection_window.attributes("-fullscreen", True)  # Полноэкранное окно
+    selection_window.attributes("-alpha", 1.0)  # Начальная непрозрачность
+    selection_window.config(bg="gray")  # Серый фон
 
-    # Создаем Canvas для отображения рамки выделения
-    canvas = tk.Canvas(selection_window, cursor="cross", bg="gray", highlightthickness=0)  # Создаём холст
-    canvas.pack(fill=tk.BOTH, expand=True)  # Заполняем всё пространство окна холстом
+    # Функция для изменения прозрачности
+    def set_transparency(alpha_value):
+        """Устанавливает прозрачность окна."""
+        selection_window.attributes("-alpha", alpha_value)
 
-    # Захватываем события мыши для выделения области
-    canvas.bind("<Button-1>", start_selection)  # Когда нажата кнопка мыши, начинается выделение
-    canvas.bind("<B1-Motion>", update_selection)  # Когда пользователь двигает мышь, обновляется рамка
-    canvas.bind("<ButtonRelease-1>", stop_selection)  # Когда кнопка мыши отпущена, выделение завершено
+    # Привязываем события для изменения прозрачности
+    canvas = tk.Canvas(selection_window, cursor="cross", bg="gray", highlightthickness=0)
+    canvas.pack(fill=tk.BOTH, expand=True)
 
-    root.wait_window(selection_window)  # Ожидаем завершения выделения, чтобы продолжить работу программы
+    def on_enter(event):
+        """Уменьшает прозрачность, когда мышь движется."""
+        set_transparency(0.5)  # Прозрачность уменьшается до 50%
+
+    def on_exit(event):
+        """Восстанавливает прозрачность после выделения."""
+        set_transparency(1.0)  # Прозрачность восстанавливается до 100%
+
+    # Привязываем события
+    canvas.bind("<Button-1>", start_selection)  # Начало выделения
+    canvas.bind("<B1-Motion>", update_selection)  # Обновление рамки
+    canvas.bind("<ButtonRelease-1>", stop_selection)  # Завершение выделения
+    canvas.bind("<Motion>", on_enter)  # Изменение прозрачности при движении мыши
+    canvas.bind("<Leave>", on_exit)  # Восстановление прозрачности при завершении
+
+    root.wait_window(selection_window)  # Ожидание закрытия окна
 def take_screenshot(region=None):
     """Сделать скриншот области или всего экрана."""
     save_folder, file_format = get_settings()  # Получаем текущие настройки из базы данных
@@ -159,7 +174,7 @@ def center_window(window, width, height):
     window.geometry(f"{width}x{height}+{x}+{y}")  # Устанавливаем геометрию окна с центровкой
 def show_settings():
     """Окно для настройки пути и формата сохранения."""
-    settings_window = ttk.Notebook() # Создаем новое окно для настроек
+    settings_window = tk.Toplevel() # Создаем новое окно для настроек
     settings_window.title("Настройки")
 
     # Получаем текущие настройки из базы данных
